@@ -1,0 +1,9 @@
+openai
+anthropic
+google-generativeai
+boto3
+mlflow
+weaviate-client
+apache-airflow-providers-amazon
+apache-airflow-providers-postgres
+apache-airflow-providers-fab

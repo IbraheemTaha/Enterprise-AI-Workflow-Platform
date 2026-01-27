@@ -1,0 +1,15 @@
+fastapi==0.128.0
+uvicorn[standard]==0.34.0
+pydantic==2.10.5
+openai==1.59.5
+anthropic==0.42.0
+google-generativeai==0.8.0
+boto3==1.35.94
+weaviate-client==4.10.2
+redis==7.1.0
+psycopg2-binary==2.9.10
+sqlalchemy==2.0.36
+mlflow==3.7.0
+python-multipart==0.0.20
+prometheus-client==0.21.1
+python-dotenv==1.0.1
