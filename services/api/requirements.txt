@@ -13,3 +13,5 @@ mlflow==3.7.0
 python-multipart==0.0.20
 prometheus-client==0.21.1
 python-dotenv==1.0.1
+pytest==8.3.4
+httpx==0.28.1

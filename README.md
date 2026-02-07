@@ -1,5 +1,7 @@
 # 🚀 Enterprise AI Workflow Platform
 
+[![Tests](https://github.com/your-org/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml/badge.svg)](https://github.com/your-org/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml)
+
 A local, Docker Compose based AI and MLOps platform that combines workflow orchestration, experiment tracking, APIs, storage, monitoring, and UI components into a single reproducible environment.
 
 This repository focuses on **infrastructure and integration**, not on a finished AI product.
