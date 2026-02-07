@@ -14,7 +14,7 @@ This platform runs the following components:
 - **Gradio** (simple UI for the API)
 - **Apache Airflow 3.1.6** (workflow orchestration)
 - **MLflow** (experiment tracking and artifacts)
-- **PostgreSQL 18.1** (metadata and application storage)
+- **PostgreSQL 18.1** (shared relational database for Airflow, MLflow, and API data)
 - **Redis 8.4** (cache / fast key-value store)
 - **Weaviate 1.34.8** (vector database, empty by default)
 - **MinIO** (S3-compatible object storage)
@@ -78,14 +78,16 @@ All services run on a single Docker bridge network and can be managed using the 
 
 ## ⚙️ Environment Configuration
 
-Edit `.env` before starting.
+- Running `make setup` will automatically create `.env` from `.env.example` if it doesn't exist.
+- Edit `.env` before starting to customize passwords and add API keys.
+
 
 **Minimum required variables:**
 
 ```env
-POSTGRES_USER=airflow
-POSTGRES_PASSWORD=airflow
-POSTGRES_DB=airflow
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=change_me_please
+POSTGRES_DB=postgres
 
 REDIS_PASSWORD=redispassword
 
@@ -110,10 +112,11 @@ AWS_REGION=us-east-1
 
 ---
 
-## 🚀 Start
+## 🚀 Quick Start
 
 ```bash
-make start
+make setup    # Checks Docker, creates .env from .env.example
+make start    # Start all services
 ```
 
 This runs:
@@ -154,6 +157,7 @@ make health
 ## 🛠 Commands
 
 ```bash
+make setup      # Check prerequisites and create .env from .env.example
 make start      # Start all services
 make stop       # Stop all services
 make restart    # Restart all services
@@ -247,13 +251,25 @@ MIT
 
 ---
 
+## 📦 Changelog
 
+### 1.0.1 – February 2026
+- Added `setup` command in the Makefile that checks prerequisites and creates `.env` from `.env.example`
+- Deleted `setup.sh` file
+- Imperoved `scripts/init-databases.sh` file adding the `AirFlow` database
+- Clarified `PostgreSQL` multi-database usage
+- Updated environment variable examples
+- Improved documentation consistency
+
+### 1.0.0 – January 2026
+- Initial release
+
+
+
+---
 ## ⭐ Star History
 
 If you find this project useful, please consider giving it a star on GitHub!
 
----
 
 **Built with ❤️ for the AI community**
-
-*Version 1.0.0 - January 2026*
