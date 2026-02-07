@@ -1,7 +1,7 @@
-include .env
+-include .env
 export
 
-.PHONY: help start stop logs clean test restart ps health
+.PHONY: help setup start stop logs clean test restart ps health
 
 help:
 	@echo "Enterprise AI Workflow Platform"
@@ -12,6 +12,31 @@ help:
 	@echo "  make logs   - View logs"
 	@echo "  make clean  - Clean everything"
 	@echo "  make test   - Run tests"
+
+setup:
+	@echo "🚀 Setting up Enterprise AI Workflow Platform..."
+	@command -v docker > /dev/null 2>&1 || { echo "❌ Docker not found. Install from: https://docs.docker.com/get-docker/"; exit 1; }
+	@command -v docker compose > /dev/null 2>&1 || { echo "❌ Docker Compose not found."; exit 1; }
+	@if [ ! -f .env ]; then \
+		if [ -f .env.example ]; then \
+			cp .env.example .env; \
+			echo "✅ .env created from .env.example"; \
+			echo "⚠️  Make sure to edit .env and add your API keys!"; \
+		else \
+			echo "❌ .env and .env.example not found."; \
+			exit 1; \
+		fi; \
+	else \
+		echo "✅ .env file found"; \
+	fi
+	@mkdir -p services/airflow/{dags,logs,plugins}
+	@mkdir -p data
+	@echo "✅ Setup complete!"
+	@echo ""
+	@echo "Next steps:"
+	@echo "1. Edit .env file: nano .env"
+	@echo "2. Add your API keys (OpenAI, Anthropic, Google, or AWS)"
+	@echo "3. Run: make start"
 
 start:
 	docker compose up -d
