@@ -1,7 +1,7 @@
 -include .env
 export
 
-.PHONY: help setup start stop logs clean test restart ps health
+.PHONY: help setup build start stop logs clean test restart ps health
 
 help:
 	@echo "Enterprise AI Workflow Platform"
@@ -38,15 +38,22 @@ setup:
 	@echo "2. Add your API keys (OpenAI, Anthropic, Google, or AWS)"
 	@echo "3. Run: make start"
 
+build:
+	docker compose build --no-cache
+	@echo "✅ Services built successfully!"
+
 start:
 	docker compose up -d
 	@echo "✅ Services started!"
 	@echo "Access:"
-	@echo "  - Gradio UI: http://localhost:7860"
-	@echo "  - API: http://localhost:8000/docs"
-	@echo "  - Airflow: http://localhost:8080"
-	@echo "  - MLflow: http://localhost:5000"
-	@echo "  - Grafana: http://localhost:3000"
+	@echo "  - Gradio UI: http://localhost:$(GRADIO_PORT)"
+	@echo "  - Streamlit UI: http://localhost:$(STREAMLIT_PORT)"
+	@echo "  - API: http://localhost:$(FASTAPI_PORT)/docs"
+	@echo "  - LangChain API: http://localhost:$(LANGCHAIN_PORT)/docs"
+	@echo "  - dbt Docs: http://localhost:$(DBT_PORT)"
+	@echo "  - Airflow: http://localhost:$(AIRFLOW_PORT)"
+	@echo "  - MLflow: http://localhost:$(MLFLOW_PORT)"
+	@echo "  - Grafana: http://localhost:$(GRAFANA_PORT)"
 
 restart:
 	docker compose restart
@@ -73,35 +80,47 @@ health:
 	@echo ""
 
 	@echo "🟢 API (FastAPI)"
-	@curl -sf http://localhost:8000/health && echo " ✅ OK" || echo " ❌ FAILED"
+	@curl -sfo /dev/null http://localhost:$(FASTAPI_PORT)/health && echo " ✅ OK" || echo " ❌ FAILED"
+	@echo ""
+
+	@echo "🟢 LangChain Service"
+	@curl -sfo /dev/null http://localhost:$(LANGCHAIN_PORT)/health && echo " ✅ OK" || echo " ❌ FAILED"
+	@echo ""
+
+	@echo "🟢 Streamlit UI"
+	@curl -sfo /dev/null http://localhost:$(STREAMLIT_PORT)/_stcore/health && echo " ✅ OK" || echo " ❌ FAILED"
+	@echo ""
+
+	@echo "🟢 dbt Docs"
+	@curl -sfo /dev/null http://localhost:$(DBT_PORT) && echo " ✅ OK" || echo " ❌ FAILED"
 	@echo ""
 
 	@echo "🟢 Airflow API Server"
-	@curl -sf http://localhost:8080/api/v2/version && echo " ✅ OK" || echo " ❌ FAILED"
+	@curl -sfo /dev/null http://localhost:$(AIRFLOW_PORT)/api/v2/version && echo " ✅ OK" || echo " ❌ FAILED"
 	@echo ""
 
 	@echo "🟢 MLflow"
-	@curl -sf http://localhost:5000 && echo " ✅ OK" || echo " ❌ FAILED"
+	@curl -sfo /dev/null http://localhost:$(MLFLOW_PORT) && echo " ✅ OK" || echo " ❌ FAILED"
 	@echo ""
 
 	@echo "🟢 Weaviate"
-	@curl -sf http://localhost:8081/v1/.well-known/ready && echo " ✅ OK" || echo " ❌ FAILED"
+	@curl -sfo /dev/null http://localhost:$(WEAVIATE_PORT)/v1/.well-known/ready && echo " ✅ OK" || echo " ❌ FAILED"
 	@echo ""
 
 	@echo "🟢 MinIO API"
-	@curl -sf http://localhost:9000/minio/health/ready && echo " ✅ OK" || echo " ❌ FAILED"
+	@curl -sfo /dev/null http://localhost:$(MINIO_API_PORT)/minio/health/ready && echo " ✅ OK" || echo " ❌ FAILED"
 	@echo ""
 
 	@echo "🟢 MinIO Console"
-	@curl -sf http://localhost:9001 && echo " ✅ OK" || echo " ❌ FAILED"
+	@curl -sfo /dev/null http://localhost:$(MINIO_CONSOLE_PORT) && echo " ✅ OK" || echo " ❌ FAILED"
 	@echo ""
 
 	@echo "🟢 Prometheus"
-	@curl -sf http://localhost:9090/-/healthy && echo " ✅ OK" || echo " ❌ FAILED"
+	@curl -sfo /dev/null http://localhost:$(PROMETHEUS_PORT)/-/healthy && echo " ✅ OK" || echo " ❌ FAILED"
 	@echo ""
 
 	@echo "🟢 Grafana"
-	@curl -sf http://localhost:3000/api/health && echo " ✅ OK" || echo " ❌ FAILED"
+	@curl -sfo /dev/null http://localhost:$(GRAFANA_PORT)/api/health && echo " ✅ OK" || echo " ❌ FAILED"
 	@echo ""
 
 	@echo "🟢 PostgreSQL"
@@ -109,7 +128,7 @@ health:
 	@echo ""
 
 	@echo "🟢 Redis"
-	@docker compose exec -T redis redis-cli -a $(REDIS_PASSWORD) ping | grep -q PONG && echo " ✅ OK" || echo " ❌ FAILED"
+	@docker compose exec -T redis redis-cli -a $(REDIS_PASSWORD) ping 2>/dev/null | grep -q PONG && echo " ✅ OK" || echo " ❌ FAILED"
 	@echo ""
 
 	@echo "✅ Health check completed."

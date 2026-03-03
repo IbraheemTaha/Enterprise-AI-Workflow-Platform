@@ -1,0 +1,111 @@
+version: 2
+
+models:
+  - name: stg_customers
+    description: Cleaned and standardized customer data from Northwind
+    columns:
+      - name: customer_id
+        description: Unique customer identifier
+        tests:
+          - unique
+          - not_null
+      - name: company_name
+        description: Standardized company name (uppercase, trimmed)
+        tests:
+          - not_null
+      - name: country
+        description: Customer country
+      - name: loaded_at
+        description: Timestamp when record was loaded
+
+  - name: stg_orders
+    description: Cleaned and enriched order data with calculated fields
+    columns:
+      - name: order_id
+        description: Unique order identifier
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: Foreign key to customers
+        tests:
+          - not_null
+      - name: employee_id
+        description: Foreign key to employees
+      - name: order_date
+        description: Date order was placed
+      - name: is_shipped
+        description: Boolean flag indicating if order has been shipped
+      - name: is_late_shipment
+        description: Boolean flag indicating if shipment was late
+      - name: days_to_ship
+        description: Number of days between order and shipment
+
+  - name: stg_order_details
+    description: Cleaned order line items with calculated amounts
+    columns:
+      - name: order_id
+        description: Foreign key to orders
+        tests:
+          - not_null
+      - name: product_id
+        description: Foreign key to products
+        tests:
+          - not_null
+      - name: gross_amount
+        description: Gross revenue (unit_price * quantity)
+      - name: net_amount
+        description: Net revenue after discount
+      - name: discount_amount
+        description: Total discount applied
+
+  - name: stg_products
+    description: Cleaned product catalog with inventory flags
+    columns:
+      - name: product_id
+        description: Unique product identifier
+        tests:
+          - unique
+          - not_null
+      - name: product_name
+        description: Product name
+        tests:
+          - not_null
+      - name: unit_price
+        description: Current selling price
+      - name: is_discontinued
+        description: Boolean flag for discontinued products
+      - name: needs_reorder
+        description: Boolean flag when stock is at or below reorder level
+      - name: is_out_of_stock
+        description: Boolean flag when stock is zero
+
+  - name: stg_employees
+    description: Cleaned employee data with calculated fields
+    columns:
+      - name: employee_id
+        description: Unique employee identifier
+        tests:
+          - unique
+          - not_null
+      - name: full_name
+        description: Concatenated first and last name
+      - name: years_employed
+        description: Years of service calculated from hire_date
+      - name: age_years
+        description: Current age in years
+      - name: manager_employee_id
+        description: Foreign key to manager (self-referencing)
+
+  - name: stg_categories
+    description: Cleaned product categories
+    columns:
+      - name: category_id
+        description: Unique category identifier
+        tests:
+          - unique
+          - not_null
+      - name: category_name
+        description: Category name
+        tests:
+          - not_null

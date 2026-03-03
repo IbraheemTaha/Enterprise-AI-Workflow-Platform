@@ -1,0 +1,33 @@
+# --- LangChain core ecosystem (all aligned to langchain-core ~1.2.x) --------
+
+langchain==1.2.10
+langchain-anthropic==1.3.3
+langchain-aws==1.2.5
+langchain-core==1.2.13
+langchain-google-genai==4.2.0
+langchain-openai==1.1.9
+langchain-weaviate==0.0.6
+
+# --- LangServe (0.3.3 was released specifically for langchain-core 1.x) -----
+langserve==0.3.3
+
+# --- Vector DB / Storage ----------------------------------------------------
+weaviate-client==4.19.2
+
+
+# --- Database ----------------------------------------------------------------
+psycopg2-binary==2.9.11
+SQLAlchemy==2.0.46
+redis==7.1.1
+
+# --- ML Ops ------------------------------------------------------------------
+mlflow==3.9.0
+
+# --- Web framework -----------------------------------------------------------
+fastapi==0.129.0
+uvicorn==0.40.0
+pydantic==2.12.5
+sse-starlette==3.2.0
+
+# --- Utilities ---------------------------------------------------------------
+python-dotenv==1.2.1

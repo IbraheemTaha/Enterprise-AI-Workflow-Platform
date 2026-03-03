@@ -6,6 +6,7 @@
 # Python
 __pycache__/
 *.py[cod]
+*$py.class
 *.so
 .Python
 venv/
@@ -38,3 +39,27 @@ Thumbs.db
 .pytest_cache/
 .coverage
 htmlcov/
+
+# dbt
+services/dbt/target/
+services/dbt/logs/
+services/dbt/.user.yml
+services/dbt/dbt_packages/
+services/dbt/dbt_internal_packages/
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Airflow
+airflow.db
+airflow.cfg
+unittests.cfg
+
+
+# markdown files
+TESTING_GUIDE.md

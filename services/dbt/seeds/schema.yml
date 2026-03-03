@@ -1,0 +1,47 @@
+version: 2
+
+seeds:
+  - name: model_pricing
+    description: "Reference data for AI model pricing and specifications"
+    config:
+      schema: seeds
+    columns:
+      - name: model_name
+        description: "Model identifier"
+        tests:
+          - unique
+          - not_null
+      - name: model_provider
+        description: "Provider of the model"
+      - name: pricing_tier
+        description: "Pricing category (economy, standard, premium)"
+        tests:
+          - accepted_values:
+              values: ['economy', 'standard', 'premium']
+      - name: cost_per_1k_tokens
+        description: "Cost per 1000 tokens in USD"
+      - name: max_tokens
+        description: "Maximum token limit"
+      - name: release_date
+        description: "Model release date"
+
+  - name: user_tiers
+    description: "User subscription tier definitions and limits"
+    config:
+      schema: seeds
+    columns:
+      - name: tier_name
+        description: "Name of the subscription tier"
+        tests:
+          - unique
+          - not_null
+      - name: min_requests_per_month
+        description: "Minimum monthly requests for this tier"
+      - name: max_requests_per_month
+        description: "Maximum monthly requests for this tier"
+      - name: monthly_fee_usd
+        description: "Monthly subscription fee in USD"
+      - name: token_allowance
+        description: "Monthly token allowance"
+      - name: priority_support
+        description: "Whether tier includes priority support (boolean)"

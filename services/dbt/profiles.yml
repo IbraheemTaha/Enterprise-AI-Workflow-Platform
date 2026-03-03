@@ -1,0 +1,29 @@
+# dbt Profile Configuration
+enterprise_ai_platform:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_POSTGRES_HOST', 'postgres') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT', 5432) | int }}"
+      user: "{{ env_var('DBT_POSTGRES_USER', 'postgres') }}"
+      password: "{{ env_var('DBT_POSTGRES_PASSWORD', 'postgres') }}"
+      dbname: "{{ env_var('DBT_POSTGRES_DB', 'dbt_db') }}"
+      schema: "{{ env_var('DBT_POSTGRES_SCHEMA', 'dbt') }}"
+      threads: "{{ env_var('DBT_THREADS', 4) | int }}"
+      keepalives_idle: 0
+      connect_timeout: 10
+      search_path: "{{ env_var('DBT_SEARCH_PATH', 'dbt,public') }}"
+
+    prod:
+      type: postgres
+      host: "{{ env_var('DBT_POSTGRES_HOST', 'postgres') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT', 5432) | int }}"
+      user: "{{ env_var('DBT_POSTGRES_USER', 'postgres') }}"
+      password: "{{ env_var('DBT_POSTGRES_PASSWORD', 'postgres') }}"
+      dbname: "{{ env_var('DBT_POSTGRES_DB', 'dbt_db') }}"
+      schema: "{{ env_var('DBT_POSTGRES_SCHEMA', 'dbt_prod') }}"
+      threads: "{{ env_var('DBT_THREADS', 8) | int }}"
+      keepalives_idle: 0
+      connect_timeout: 10
+      search_path: "{{ env_var('DBT_SEARCH_PATH', 'dbt_prod,public') }}"
