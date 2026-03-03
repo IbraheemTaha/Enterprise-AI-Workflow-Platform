@@ -1,0 +1,160 @@
+version: 2
+
+sources:
+  - name: northwind
+    description: |
+      Northwind database - A classic demo database representing a small trading company.
+      Contains orders, products, customers, employees, and related business data.
+    database: dbt_db
+    schema: public
+    tables:
+      - name: customers
+        description: Customer information for the trading company
+        columns:
+          - name: customer_id
+            description: Unique customer identifier (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: company_name
+            description: Company name
+            tests:
+              - not_null
+          - name: contact_name
+            description: Primary contact person
+          - name: city
+            description: City
+          - name: country
+            description: Country
+
+      - name: orders
+        description: Customer orders placed with the company
+        columns:
+          - name: order_id
+            description: Unique order identifier (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            description: Foreign key to customers table
+            tests:
+              - not_null
+              - relationships:
+                  to: source('northwind', 'customers')
+                  field: customer_id
+          - name: employee_id
+            description: Employee who took the order
+            tests:
+              - relationships:
+                  to: source('northwind', 'employees')
+                  field: employee_id
+          - name: order_date
+            description: Date the order was placed
+          - name: shipped_date
+            description: Date the order was shipped
+          - name: freight
+            description: Shipping cost
+
+      - name: order_details
+        description: Line items for each order (order-product junction table)
+        columns:
+          - name: order_id
+            description: Foreign key to orders table
+            tests:
+              - not_null
+              - relationships:
+                  to: source('northwind', 'orders')
+                  field: order_id
+          - name: product_id
+            description: Foreign key to products table
+            tests:
+              - not_null
+              - relationships:
+                  to: source('northwind', 'products')
+                  field: product_id
+          - name: unit_price
+            description: Price per unit at time of order
+            tests:
+              - not_null
+          - name: quantity
+            description: Quantity ordered
+            tests:
+              - not_null
+          - name: discount
+            description: Discount applied (0-1 decimal)
+
+      - name: products
+        description: Products sold by the company
+        columns:
+          - name: product_id
+            description: Unique product identifier (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: product_name
+            description: Product name
+            tests:
+              - not_null
+          - name: category_id
+            description: Foreign key to categories table
+            tests:
+              - relationships:
+                  to: source('northwind', 'categories')
+                  field: category_id
+          - name: unit_price
+            description: Current unit price
+          - name: discontinued
+            description: Whether the product is discontinued (0/1)
+
+      - name: employees
+        description: Company employees who process orders
+        columns:
+          - name: employee_id
+            description: Unique employee identifier (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: last_name
+            description: Employee last name
+            tests:
+              - not_null
+          - name: first_name
+            description: Employee first name
+            tests:
+              - not_null
+          - name: title
+            description: Job title
+          - name: hire_date
+            description: Date hired
+          - name: reports_to
+            description: Manager's employee_id (self-referencing FK)
+
+      - name: categories
+        description: Product categories
+        columns:
+          - name: category_id
+            description: Unique category identifier (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: category_name
+            description: Category name
+            tests:
+              - not_null
+          - name: description
+            description: Category description
+
+      - name: suppliers
+        description: Product suppliers
+        columns:
+          - name: supplier_id
+            description: Unique supplier identifier (primary key)
+            tests:
+              - unique
+              - not_null
+          - name: company_name
+            description: Supplier company name
+            tests:
+              - not_null
+          - name: country
+            description: Country
