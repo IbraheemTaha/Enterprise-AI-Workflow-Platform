@@ -1,0 +1,70 @@
+# dbt Project Configuration
+name: 'enterprise_ai_platform'
+version: '1.1.0'
+config-version: 2
+
+# Project profile
+profile: 'enterprise_ai_platform'
+
+# Source paths
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# Model configurations
+models:
+  enterprise_ai_platform:
+    # Staging models - always views for freshness
+    staging:
+      +materialized: view
+      +schema: staging
+      +tags: ['staging']
+
+    # Marts models - materialized as tables for performance
+    marts:
+      +materialized: table
+      +schema: marts
+      +tags: ['marts']
+      # Option to make specific marts incremental later
+      # fct_daily_model_performance:
+      #   +materialized: incremental
+      #   +unique_key: ['metric_date', 'model_name']
+
+    # Example models (keeping for reference)
+    example:
+      +materialized: view
+      +schema: example
+
+# Documentation
+docs-paths: ["docs"]
+
+# Variables
+vars:
+  # You can define variables here
+  # Example: start_date: '2024-01-01'
+  platform_name: 'Enterprise AI Workflow Platform'
+
+# Tests
+tests:
+  +store_failures: true
+  +schema: test_results
+
+# Seeds
+seeds:
+  enterprise_ai_platform:
+    +schema: seeds
+    +quote_columns: false
+    +tags: ['seeds', 'reference']
+    # Seed-specific configs
+    model_pricing:
+      +enabled: true
+    user_tiers:
+      +enabled: true
+flags:
+  require_generic_test_arguments_property: true

@@ -6,11 +6,16 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      MLFLOW_DB: ${MLFLOW_DB:-mlflow_db}
+      FASTAPI_DB: ${FASTAPI_DB:-fastapi_db}
+      AIRFLOW_DB: ${AIRFLOW_DB:-airflow_db}
+      LANGCHAIN_DB: ${LANGCHAIN_DB:-langchain_db}
+      DBT_DB: ${DBT_DB:-dbt_db}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./scripts/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     networks:
       - ai_network
     healthcheck:
@@ -27,7 +32,7 @@ services:
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     networks:
       - ai_network
     healthcheck:
@@ -47,8 +52,8 @@ services:
     volumes:
       - minio_data:/data
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
     networks:
       - ai_network
     restart: unless-stopped
@@ -56,15 +61,18 @@ services:
   weaviate:
     image: semitechnologies/weaviate:1.34.8
     container_name: weaviate
+    hostname: weaviate-node1
     environment:
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
       PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
       DEFAULT_VECTORIZER_MODULE: 'none'
       ENABLE_MODULES: 'text2vec-openai,generative-openai'
+      RAFT_JOIN: 'weaviate-node1'
+      RAFT_BOOTSTRAP_EXPECT: 1
     volumes:
       - weaviate_data:/var/lib/weaviate
     ports:
-      - "8081:8080"
+      - "${WEAVIATE_PORT:-8081}:8080"
     networks:
       - ai_network
     restart: unless-stopped
@@ -76,9 +84,9 @@ services:
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
       AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
-    command: mlflow server --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/mlflow --default-artifact-root s3://mlflow-artifacts/ --host 0.0.0.0 --port 5000
+    command: mlflow server --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${MLFLOW_DB:-mlflow_db} --default-artifact-root s3://mlflow-artifacts/ --host 0.0.0.0 --port 5000
     ports:
-      - "5000:5000"
+      - "${MLFLOW_PORT:-5000}:5000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -94,7 +102,7 @@ services:
     container_name: airflow-init
     environment: &airflow-env
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${AIRFLOW_DB:-airflow_db}
       AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
       AIRFLOW__API__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
@@ -138,7 +146,7 @@ services:
     user: "${AIRFLOW_UID}:0"
     command: api-server
     ports:
-      - "8080:8080"
+      - "${AIRFLOW_PORT:-8080}:8080"
     volumes:
       - ./services/airflow/dags:/opt/airflow/dags
       - ./services/airflow/logs:/opt/airflow/logs
@@ -200,12 +208,12 @@ services:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_REGION: ${AWS_REGION:-us-east-1}
-      POSTGRES_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/app
+      POSTGRES_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${FASTAPI_DB:-fastapi_db}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
       WEAVIATE_URL: http://weaviate:8080
       MLFLOW_TRACKING_URI: http://mlflow:5000
     ports:
-      - "8000:8000"
+      - "${FASTAPI_PORT:-8000}:8000"
     volumes:
       - ./services/api:/app
     depends_on:
@@ -223,13 +231,117 @@ services:
     build: ./services/gradio
     container_name: gradio-ui
     environment:
-      API_URL: http://api:8000
+      API_URL: ${API_URL:-http://api:8000}
     ports:
-      - "7860:7860"
+      - "${GRADIO_PORT:-7860}:7860"
+    volumes:
+      - ./services/gradio:/app
     depends_on:
       - api
     networks:
       - ai_network
+    restart: unless-stopped
+
+  langchain:
+    build: ./services/langchain
+    container_name: langchain-service
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+      POSTGRES_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${LANGCHAIN_DB:-langchain_db}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/1
+      WEAVIATE_URL: http://weaviate:8080
+      MLFLOW_TRACKING_URI: http://mlflow:5000
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${LANGCHAIN_PORT:-8001}:8001"
+    volumes:
+      - ./services/langchain:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      weaviate:
+        condition: service_started
+    networks:
+      - ai_network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  streamlit:
+    build: ./services/streamlit
+    container_name: streamlit-ui
+    environment:
+      API_URL: ${API_URL:-http://api:8000}
+      LANGCHAIN_URL: ${LANGCHAIN_URL:-http://langchain:8001}
+      GRADIO_PORT: ${GRADIO_PORT:-7860}
+      FASTAPI_PORT: ${FASTAPI_PORT:-8000}
+      LANGCHAIN_PORT: ${LANGCHAIN_PORT:-8001}
+      DBT_PORT: ${DBT_PORT:-8002}
+      AIRFLOW_PORT: ${AIRFLOW_PORT:-8080}
+      MLFLOW_PORT: ${MLFLOW_PORT:-5000}
+      WEAVIATE_PORT: ${WEAVIATE_PORT:-8081}
+      PROMETHEUS_PORT: ${PROMETHEUS_PORT:-9090}
+      GRAFANA_PORT: ${GRAFANA_PORT:-3000}
+      MINIO_API_PORT: ${MINIO_API_PORT:-9000}
+      MINIO_CONSOLE_PORT: ${MINIO_CONSOLE_PORT:-9001}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+    ports:
+      - "${STREAMLIT_PORT:-8501}:8501"
+    volumes:
+      - ./services/streamlit:/app
+      - ./data:/data
+      - /var/run/docker.sock:/var/run/docker.sock  # Allow Docker commands from Streamlit
+    depends_on:
+      - api
+      - langchain
+    networks:
+      - ai_network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  dbt:
+    build: ./services/dbt
+    container_name: dbt-transform
+    environment:
+      DBT_POSTGRES_HOST: postgres
+      DBT_POSTGRES_PORT: 5432
+      DBT_POSTGRES_USER: ${POSTGRES_USER}
+      DBT_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DBT_POSTGRES_DB: ${DBT_DB:-dbt_db}
+      DBT_POSTGRES_SCHEMA: dbt
+      DBT_THREADS: 4
+      DBT_SEARCH_PATH: dbt,public
+    ports:
+      - "${DBT_PORT:-8002}:8002"
+    volumes:
+      - ./services/dbt:/dbt
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ai_network
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8002"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
     restart: unless-stopped
 
   prometheus:
@@ -242,7 +354,7 @@ services:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     ports:
-      - "9090:9090"
+      - "${PROMETHEUS_PORT:-9090}:9090"
     networks:
       - ai_network
     restart: unless-stopped
@@ -257,7 +369,7 @@ services:
       - grafana_data:/var/lib/grafana
       - ./config/grafana:/etc/grafana/provisioning
     ports:
-      - "3000:3000"
+      - "${GRAFANA_PORT:-3000}:3000"
     depends_on:
       - prometheus
     networks:
