@@ -1,5 +1,4 @@
-from airflow import DAG
-from airflow.decorators import task
+from airflow.sdk import DAG, task
 from datetime import datetime
 
 with DAG(

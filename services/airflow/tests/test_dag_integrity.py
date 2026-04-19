@@ -47,7 +47,7 @@ def test_example_dag_has_expected_tasks():
     from airflow.models import DagBag
 
     dag_bag = DagBag(dag_folder=str(DAGS_DIR / "example_dag.py"), include_examples=False)
-    dag = dag_bag.get_dag("example_ml_pipeline")
+    dag = dag_bag.dags.get("example_ml_pipeline")
     assert dag is not None, "example_ml_pipeline DAG not found"
     task_ids = {t.task_id for t in dag.tasks}
     assert {"extract_data", "process_data", "train_model"}.issubset(task_ids)
