@@ -476,6 +476,16 @@ MIT
 
 ## Changelog
 
+### 1.2.0 – April 20, 2026
+
+**CI / Testing**
+- Added per-service GitHub Actions workflows with primary test coverage for FastAPI, LangChain, Gradio, Streamlit, MLflow, Airflow, dbt, and Docker Compose
+- FastAPI, LangChain, Gradio, Streamlit, MLflow — `pytest` suites covering imports, health endpoints, and core request/response paths
+- Airflow — DAG integrity tests (import errors, DAG presence, expected task structure)
+- dbt — `dbt parse` and model compilation checks
+- Compose — `docker compose config` validation
+- Service test status badges added to the README
+
 ### 1.1.0 – March 3, 2026
 
 **New services**
