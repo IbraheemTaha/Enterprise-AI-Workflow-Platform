@@ -1,0 +1,64 @@
+name: dbt
+
+on:
+  push:
+    branches: [ main, dev, master, develop ]
+  pull_request:
+    branches: [ main, dev, master, develop ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: dbt project tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: dbt_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DBT_POSTGRES_HOST: localhost
+      DBT_POSTGRES_PORT: "5432"
+      DBT_POSTGRES_USER: postgres
+      DBT_POSTGRES_PASSWORD: postgres
+      DBT_POSTGRES_DB: dbt_db
+      DBT_POSTGRES_SCHEMA: dbt
+      DBT_THREADS: "4"
+      DBT_SEARCH_PATH: "dbt,public"
+    defaults:
+      run:
+        working-directory: services/dbt
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dbt-postgres and pytest
+        run: |
+          python -m pip install --upgrade pip
+          pip install "dbt-postgres==1.9.0" pytest pyyaml
+      - name: Run project structure tests
+        run: pytest tests/ -v
+      - name: dbt deps + parse
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/services/dbt
+        run: |
+          dbt deps || true
+          dbt parse --no-partial-parse
+      - name: dbt debug
+        env:
+          DBT_PROFILES_DIR: ${{ github.workspace }}/services/dbt
+        run: dbt debug

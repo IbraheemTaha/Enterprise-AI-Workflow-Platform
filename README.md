@@ -1,22 +1,23 @@
 # Enterprise AI Workflow Platform
 
-[![CI](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml)
 [![Python](https://img.shields.io/badge/python-3.12-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![Docker](https://img.shields.io/badge/docker-compose-2496ED.svg?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ### ✅ Service Test Status
 
+Each badge below is produced by its own GitHub Actions workflow and refreshes on every push to `dev` (or `main`).
+
 | Service | Status |
 |---------|--------|
-| ⚡ FastAPI | [![FastAPI](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/tests.yml?branch=main&label=tests&logo=fastapi&logoColor=white)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml) |
-| 🔗 LangChain | [![LangChain](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/tests.yml?branch=main&label=tests&logo=langchain&logoColor=white)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml) |
-| 🎨 Gradio | [![Gradio](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/tests.yml?branch=main&label=tests&logo=gradio&logoColor=white)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml) |
-| 📊 Streamlit | [![Streamlit](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/tests.yml?branch=main&label=tests&logo=streamlit&logoColor=white)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml) |
-| 🧪 MLflow | [![MLflow](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/tests.yml?branch=main&label=tests&logo=mlflow&logoColor=white)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml) |
-| 🌀 Airflow | [![Airflow](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/tests.yml?branch=main&label=tests&logo=apacheairflow&logoColor=white)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml) |
-| 🗄️ dbt | [![dbt](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/tests.yml?branch=main&label=tests&logo=dbt&logoColor=white)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml) |
-| 🐳 Compose | [![Compose](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/tests.yml?branch=main&label=config&logo=docker&logoColor=white)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/tests.yml) |
+| ⚡ FastAPI | [![FastAPI](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/api.yml?branch=dev&label=tests&logo=fastapi&logoColor=white&style=flat-square)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/api.yml) |
+| 🔗 LangChain | [![LangChain](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/langchain.yml?branch=dev&label=tests&logo=langchain&logoColor=white&style=flat-square)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/langchain.yml) |
+| 🎨 Gradio | [![Gradio](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/gradio.yml?branch=dev&label=tests&logo=gradio&logoColor=white&style=flat-square)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/gradio.yml) |
+| 📊 Streamlit | [![Streamlit](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/streamlit.yml?branch=dev&label=tests&logo=streamlit&logoColor=white&style=flat-square)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/streamlit.yml) |
+| 🧪 MLflow | [![MLflow](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/mlflow.yml?branch=dev&label=tests&logo=mlflow&logoColor=white&style=flat-square)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/mlflow.yml) |
+| 🌀 Airflow | [![Airflow](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/airflow.yml?branch=dev&label=tests&logo=apacheairflow&logoColor=white&style=flat-square)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/airflow.yml) |
+| 🗄️ dbt | [![dbt](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/dbt.yml?branch=dev&label=tests&logo=dbt&logoColor=white&style=flat-square)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/dbt.yml) |
+| 🐳 Compose | [![Compose](https://img.shields.io/github/actions/workflow/status/IbraheemTaha/Enterprise-AI-Workflow-Platform/compose.yml?branch=dev&label=config&logo=docker&logoColor=white&style=flat-square)](https://github.com/IbraheemTaha/Enterprise-AI-Workflow-Platform/actions/workflows/compose.yml) |
 
 A local, Docker Compose based AI and MLOps platform that combines workflow orchestration, experiment tracking, APIs, storage, monitoring, and UI components into a single reproducible environment.
 
