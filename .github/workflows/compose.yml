@@ -1,0 +1,23 @@
+name: Compose
+
+on:
+  push:
+    branches: [ main, dev, master, develop ]
+  pull_request:
+    branches: [ main, dev, master, develop ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: docker compose config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create .env from example
+        run: cp .env.example .env || echo "# empty" > .env
+      - name: Validate docker-compose.yml
+        run: docker compose config --quiet

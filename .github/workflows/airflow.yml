@@ -1,0 +1,38 @@
+name: Airflow
+
+on:
+  push:
+    branches: [ main, dev, master, develop ]
+  pull_request:
+    branches: [ main, dev, master, develop ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Airflow DAG integrity
+    runs-on: ubuntu-latest
+    env:
+      AIRFLOW_HOME: ${{ github.workspace }}/airflow_home
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      AIRFLOW__CORE__UNIT_TEST_MODE: "True"
+    defaults:
+      run:
+        working-directory: services/airflow
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Airflow and DAG dependencies
+        run: |
+          python -m pip install --upgrade pip
+          AIRFLOW_VERSION=3.1.6
+          PYTHON_VERSION="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+          CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
+          pip install --retries 10 --timeout 60 --progress-bar off "apache-airflow==${AIRFLOW_VERSION}" pytest --constraint "${CONSTRAINT_URL}"
+      - name: Run DAG integrity tests
+        run: pytest tests/ -v
